@@ -7,6 +7,7 @@ logging:
     com.ziyear: ERROR
 
 spring:
+  profiles: prd
   datasource:
     hikari:
       auto-commit: false
