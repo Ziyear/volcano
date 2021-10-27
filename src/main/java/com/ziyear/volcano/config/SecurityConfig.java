@@ -1,7 +1,10 @@
 package com.ziyear.volcano.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ziyear.volcano.security.auth.ldap.LDAPMultiAuthenticationProvider;
+import com.ziyear.volcano.security.auth.ldap.LDAPUserDao;
 import com.ziyear.volcano.security.filter.RestAuthenticationFilter;
+import com.ziyear.volcano.security.jwt.JwtFilter;
 import com.ziyear.volcano.security.userdetails.UserDetailsPasswordServiceImpl;
 import com.ziyear.volcano.security.userdetails.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -45,6 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final SecurityProblemSupport problemSupport;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
     private final UserDetailsPasswordServiceImpl userDetailsPasswordServiceImpl;
+    private final LDAPUserDao ldapUserDao;
+    private final JwtFilter jwtFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -63,6 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf(csrf -> csrf.ignoringAntMatchers("/authorize/**", "/admin/**", "/api/**"))
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(problemSupport))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         ;
     }
 
@@ -70,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web
                 .ignoring()
-                .antMatchers("/error/**", "/h2-console/**");
+                .antMatchers("/authorize/**","/error/**", "/h2-console/**");
     }
 
     @Override
@@ -84,10 +91,28 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //        .withUser("old_user")
         //        .password("{SHA-1}{TMlrFVppiMOhmI6VBoytlEkepfqUHrpyOXgCoFUo3Mk=}1ebde6bb35fd02816880948864fa771eb85a122a")
         //        .roles("USER");
-        auth
-                .userDetailsService(userDetailsServiceImpl) // 配置 AuthenticationManager 使用 userService
-                .passwordEncoder(passwordEncoder()) // 配置 AuthenticationManager 使用 userService
-                .userDetailsPasswordManager(userDetailsPasswordServiceImpl); // 配置密码自动升级服务
+//        auth
+//                .userDetailsService(userDetailsServiceImpl) // 配置 AuthenticationManager 使用 userService
+//                .passwordEncoder(passwordEncoder()) // 配置 AuthenticationManager 使用 userService
+//                .userDetailsPasswordManager(userDetailsPasswordServiceImpl); // 配置密码自动升级服务
+        auth.authenticationProvider(ldapMultiAuthenticationProvider());
+
+        auth.authenticationProvider(daoAuthenticationProvider());
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsServiceImpl);// 配置 AuthenticationManager 使用 userService
+        provider.setPasswordEncoder(passwordEncoder()); // 配置 AuthenticationManager 使用 userService
+        provider.setUserDetailsPasswordService(userDetailsPasswordServiceImpl);
+        return provider;
+    }
+
+    @Bean
+    public LDAPMultiAuthenticationProvider ldapMultiAuthenticationProvider(){
+        LDAPMultiAuthenticationProvider provider = new LDAPMultiAuthenticationProvider(ldapUserDao);
+        return provider;
     }
 
     @Bean

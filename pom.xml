@@ -21,6 +21,7 @@
         <problem.version>0.26.1</problem.version>
         <bootstrap.version>4.5.0</bootstrap.version>
         <jjwt.version>0.11.1</jjwt.version>
+        <guava.version>31.0.1-jre</guava.version>
     </properties>
 
     <dependencies>
@@ -115,6 +116,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
         <!-- 用于开发 -->
         <dependency>
