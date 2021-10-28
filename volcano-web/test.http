@@ -1,0 +1,48 @@
+###
+# @name greeting
+GET {{host}}/authorize/greeting HTTP/1.1
+
+###
+POST {{host}}/authorize/login
+Content-Type: application/json
+
+{
+  "username": "zhaoliu",
+  "password": "123"
+}
+
+###
+POST {{host}}/authorize/logout
+
+###
+# @name register
+POST {{host}}/authorize/register
+Accept-Language: zh-CN
+Content-Type: application/json
+
+{
+  "name": "张三",
+  "username": "zhangsan",
+  "password": "Ab111111!",
+  "matchingPassword": "Ab111111!",
+  "mobile": "13089000987",
+  "email": "zs@local.com"
+}
+
+###
+POST {{host}}/authorize/token
+Accept-Language: zh-CN
+Content-Type: application/json
+
+{
+  "username": "zhangsan",
+  "password": "Ab111111!"
+}
+
+###
+GET {{host}}//api/principal
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2b2xjYW5vIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9BRE1JTiIsIlJPTEVfVVNFUiJdLCJzdWIiOiJ1c2VyIiwiaWF0IjoxNjM1MzQ1NDQxLCJleHAiOjE2MzUzNDU3NDF9.UABcmSflo6G39Q54TW8sJOMq-jpDCbyvMIz1g6cn2FM
+
+###
+POST {{host}}/authorize/token/refresh?refreshToken=eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2b2xjYW5vIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sInN1YiI6InpoYW5nc2FuIiwiaWF0IjoxNjM1MzgyODY2LCJleHAiOjE2NjEzMDI4NjZ9.nRx4lyePVluKdx_W_nils5AWY4_1Kf1HHcmNAaCMwIg
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2b2xjYW5vIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl0sInN1YiI6InpoYW5nc2FuIiwiaWF0IjoxNjM1MzgyODY2LCJleHAiOjE2MzUzODMxNjZ9.5vRHjYXFvwV81maDHWRegaLpDJ5rovdhgZlVe09cE2c

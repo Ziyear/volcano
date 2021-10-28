@@ -1,0 +1,80 @@
+logging:
+  level:
+    com:
+      imooc: DEBUG
+    org:
+      hibernate: DEBUG
+      springframework:
+        data: DEBUG
+        jdbc: DEBUG
+        security: DEBUG
+    web: DEBUG
+  pattern:
+    console: '%clr(%d{E HH:mm:ss.SSS}){blue} %clr(%-5p) %clr(${PID}){faint} %clr(---){faint}
+              %clr([%8.15t]){cyan} %clr(%-40.40logger{0}){blue} %clr(:){red} %clr(%m){faint}%n'
+spring:
+  profiles: dev
+  cache:
+    type: none
+  redis:
+    host: localhost
+    port: 6379
+  datasource:
+    hikari:
+      auto-commit: false
+      data-source-properties:
+        # 缓存 SQL 语句
+        cachePrepStmts: true
+        # 缓存大小
+        prepStmtCacheSize: 250
+        # 缓存 SQL 的长度限制
+        prepStmtCacheSqlLimit: 2048
+        # 服务器预编译
+        useServerPrepStmts: true
+      pool-name: Hikari
+    type: com.zaxxer.hikari.HikariDataSource
+    # 数据库连接 URL
+    url: jdbc:mysql://localhost:3306/volcano?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
+    # 数据库用户名
+    username: root
+    # 数据库密码
+    password: 123456
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      # 禁用 hibernate 的表结构自动更新
+      ddl-auto: update
+    show-sql: true
+  ldap:
+    base: dc=volcano,dc=com
+    embedded:
+      base-dn: dc=volcano,dc=com
+      ldif: classpath:test-ldap-server.ldif
+      port: 389
+    urls: ldap://localhost:389/
+  mail:
+    host: smtp.163.com
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    username: ${SMTP_USERNAME}
+
+volcano:
+  sms-provider:
+    name: tx
+  tx:
+    appId: ${TX_APP_ID}
+    secretId: ${TX_SECRET_ID}
+    secretKey: ${TX_SECRET_KEY}
+  email-provider:
+    name: smtp
