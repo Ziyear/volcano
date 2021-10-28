@@ -5,7 +5,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>volcano-ui</module>
-        <module>volcano-web</module>
+        <module>volcano-start</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
