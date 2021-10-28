@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>volcano-web</artifactId>
+    <artifactId>volcano-start</artifactId>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
