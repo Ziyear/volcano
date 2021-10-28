@@ -13,10 +13,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -32,8 +35,13 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsPasswordServiceImpl userDetailsPasswordServiceImpl;
     private final LDAPUserDao ldapUserDao;
     private final JwtFilter jwtFilter;
+    private final Environment environment;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -61,12 +70,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(problemSupport)
                         .accessDeniedHandler(problemSupport))
+                .cors(cors->cors.configurationSource(corsConfigurationSource()))
                 .authorizeRequests(authorizeRequests -> authorizeRequests
                         .antMatchers("/admin/**").hasRole("ADMIN")
                         .antMatchers("/api/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .addFilterAt(restAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .csrf(csrf -> csrf.ignoringAntMatchers("/authorize/**", "/admin/**", "/api/**"))
+                .csrf(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(problemSupport))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -77,7 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web
                 .ignoring()
-                .antMatchers("/authorize/**","/error/**", "/h2-console/**");
+                .antMatchers("/authorize/**", "/error/**", "/h2-console/**");
     }
 
     @Override
@@ -110,7 +120,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public LDAPMultiAuthenticationProvider ldapMultiAuthenticationProvider(){
+    public LDAPMultiAuthenticationProvider ldapMultiAuthenticationProvider() {
         LDAPMultiAuthenticationProvider provider = new LDAPMultiAuthenticationProvider(ldapUserDao);
         return provider;
     }
@@ -119,6 +129,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    // 跨域
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        if (environment.acceptsProfiles(Profiles.of("dev"))) {
+            corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4001"));
+        } else {
+            corsConfiguration.setAllowedOrigins(Collections.singletonList("http://volcano.ziyear.com"));
+        }
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "OPTIONS"));
+        corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+        corsConfiguration.addExposedHeader("X-Authenticate");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
     }
 
     @Bean

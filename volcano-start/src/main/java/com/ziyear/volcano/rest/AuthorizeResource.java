@@ -112,7 +112,7 @@ public class AuthorizeResource {
             if (MfaType.SMS.equals(sendTotpDto.getMfaType())) {
                 smsService.send(userTotpPair.getFirst().getMobile(), userTotpPair.getSecond());
             } else {
-                smsService.send(userTotpPair.getFirst().getEmail(), userTotpPair.getSecond());
+                emailService.send(userTotpPair.getFirst().getEmail(), userTotpPair.getSecond());
             }
         } else {
             throw new InvalidTotpProblem();

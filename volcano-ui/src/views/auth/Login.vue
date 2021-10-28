@@ -15,11 +15,6 @@
             <a-icon slot="prefix" type="lock" style="color:rgba(0,0,0,.25)" />
           </a-input>
         </a-form-model-item>
-        <a-form-model-item has-feedback prop="icode">
-          <a-input v-model="model.icode" placeholder="在慕课网课程首页可以找到 icode">
-            <a-icon slot="prefix" type="lock" style="color:rgba(0,0,0,.25)" />
-          </a-input>
-        </a-form-model-item>
         <a-form-model-item v-bind="tailFormItemLayout">
           <a-button type="primary" @click="submitForm('form')">登录</a-button>
           <a-button type="link" htmlType="button" @click="handleNavRegister()">还没有注册？</a-button>
@@ -63,8 +58,7 @@ export default {
         if (valid) {
           this.$store.dispatch("login", {
             username: this.model.username,
-            password: this.model.password,
-            icode: this.model.icode,
+            password: this.model.password
           });
         }
       });

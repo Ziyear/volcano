@@ -35,7 +35,7 @@ public class UserCacheServiceImpl implements UserCacheService {
     public String cacheUser(User user) {
         String mfaId = cryptoUtil.randomAlphanumeric(12);
         RMapCache<String, User> cache = redissonClient.getMapCache(Constants.CACHE_MFA);
-        if (cache.containsKey(mfaId)) {
+        if (!cache.containsKey(mfaId)) {
             cache.put(mfaId, user, totpUtil.getTimeStepInLong(), TimeUnit.SECONDS);
         }
         return mfaId;

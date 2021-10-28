@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import AUTH_API from "../services/auth.service";
-import IMOOC_API from "../services/imooc.service";
 import router from "../router";
 import UTIL from "@/core/util";
 import { usersModule } from "./modules/users.js";
@@ -97,52 +96,46 @@ export default new Vuex.Store({
           router.push("/login");
         });
     },
-    login: ({ commit }, { username, password, icode }) => {
-      IMOOC_API.verifyCode(icode).then((res) => {
-        if (res.data.code === 1000) {
-          AUTH_API.login(username, password)
-            .then((res) => {
-              if (res.data) {
-                commit("loginSuccess", {
-                  accessToken: res.data.accessToken,
-                  refreshToken: res.data.refreshToken,
-                });
-                router.push("/");
-                return;
-              }
-              commit("loginFail", "服务器返回结果异常");
-            })
-            .catch((err) => {
-              if (err.response) {
-                const headers = err.response.headers;
-                // 判断是否需要多因子认证
-                const MFA_PREFIX = "realm=";
-                for (const key in headers) {
-                  if (key === "x-authenticate") {
-                    const elements = headers[key].split(", ");
-                    if (
-                      elements.length === 2 &&
-                      elements[0] === "mfa" &&
-                      elements[1].startsWith(MFA_PREFIX)
-                    ) {
-                      commit("setMfa", elements[1].replace(MFA_PREFIX, ""));
-                      router.push("/mfa");
-                      return;
-                    }
-                  }
+    login: ({ commit }, { username, password }) => {
+      AUTH_API.login(username, password)
+        .then((res) => {
+          if (res.data) {
+            commit("loginSuccess", {
+              accessToken: res.data.accessToken,
+              refreshToken: res.data.refreshToken,
+            });
+            router.push("/");
+            return;
+          }
+          commit("loginFail", "服务器返回结果异常");
+        })
+        .catch((err) => {
+          if (err.response) {
+            const headers = err.response.headers;
+            // 判断是否需要多因子认证
+            const MFA_PREFIX = "realm=";
+            for (const key in headers) {
+              if (key === "x-authenticate") {
+                const elements = headers[key].split(", ");
+                if (
+                  elements.length === 2 &&
+                  elements[0] === "mfa" &&
+                  elements[1].startsWith(MFA_PREFIX)
+                ) {
+                  commit("setMfa", elements[1].replace(MFA_PREFIX, ""));
+                  router.push("/mfa");
+                  return;
                 }
               }
+            }
+          }
 
-              commit(
-                "loginFail",
-                UTIL.getErrorDetailFromResponse(err.response.data) ||
-                  "用户名或密码错误"
-              );
-            });
-        } else {
-          commit("loginFail", res.data.msg);
-        }
-      });
+          commit(
+            "loginFail",
+            UTIL.getErrorDetailFromResponse(err.response.data) ||
+              "用户名或密码错误"
+          );
+        });
     },
     reset: ({ commit }) => {
       commit("reset");

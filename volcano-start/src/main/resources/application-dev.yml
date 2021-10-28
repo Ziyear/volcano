@@ -1,7 +1,7 @@
 logging:
   level:
     com:
-      imooc: DEBUG
+      ziyear: DEBUG
     org:
       hibernate: DEBUG
       springframework:

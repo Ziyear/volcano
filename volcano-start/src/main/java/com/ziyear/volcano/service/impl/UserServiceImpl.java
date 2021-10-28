@@ -10,8 +10,6 @@ import com.ziyear.volcano.util.Constants;
 import com.ziyear.volcano.util.JwtUtil;
 import com.ziyear.volcano.util.TotpUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -81,6 +79,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<String> createTotp(String key) {
-        return Optional.empty();
+        return totpUtil.createTotp(key);
     }
 }

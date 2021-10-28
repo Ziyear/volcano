@@ -8,7 +8,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -20,16 +23,35 @@ import org.zalando.problem.violations.ConstraintViolationProblemModule;
 public class WebMvcConfig implements WebMvcConfigurer {
 
     private final MessageSource messageSource;
+    private final Environment environment;
 
     @Bean
     public ObjectMapper objectMapper() {
         return new ObjectMapper().registerModules(
-            new ProblemModule(),
-            new ConstraintViolationProblemModule());
+                new ProblemModule(),
+                new ConstraintViolationProblemModule());
+    }
+
+    // 跨域
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        if (environment.acceptsProfiles(Profiles.of("dev"))) {
+            registry.addMapping("/**")
+                    .allowedHeaders("*")
+                    .exposedHeaders("X-Authenticate")
+                    .allowedOrigins("http://localhost:4001");
+        } else {
+            registry.addMapping("/**")
+                    .allowedHeaders("*")
+                    .exposedHeaders("X-Authenticate")
+                    .allowedMethods("GET", "POST", "DELETE", "PUT", "OPTIONS")
+                    .allowedOrigins("http://volcano.ziyear.com");
+        }
     }
 
     /**
      * 配置 Java Validation 使用国际化的消息资源
+     *
      * @return LocalValidatorFactoryBean
      */
     @Override
@@ -42,6 +64,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     /**
      * 配置 Passay 使用 Spring 的 MessageSource
+     *
      * @return MessageResolver
      */
     @Bean
@@ -52,8 +75,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/webjars/**")
-            .addResourceLocations("/webjars/")
-            .resourceChain(false);
+                .addResourceLocations("/webjars/")
+                .resourceChain(false);
         registry.setOrder(1);
     }
 

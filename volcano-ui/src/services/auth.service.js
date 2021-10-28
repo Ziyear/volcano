@@ -7,10 +7,10 @@ export default {
   },
   sendMfa(mfaId, mfaType) {
     const url = `/totp`;
-    return AUTH_AXIOS.put(url, { mfaId, mfaType });
+    return AUTH_AXIOS.post(url, { mfaId, mfaType });
   },
   verifyMfa(mfaId, code) {
-    const url = `/totp`;
+    const url = `/verifyTotp`;
     return AUTH_AXIOS.post(url, { mfaId, code });
   },
   register(user) {
