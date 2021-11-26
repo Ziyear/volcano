@@ -35,6 +35,8 @@
         <sendgrid.version>4.0.1</sendgrid.version>
         <greenmail.version>1.5.13</greenmail.version>
         <frontend-maven-plugin.version>1.9.1</frontend-maven-plugin.version>
+        <querydsl.version>4.3.1</querydsl.version>
+        <springdoc.version>1.4.0</springdoc.version>
     </properties>
 
     <dependencies>

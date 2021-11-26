@@ -17,6 +17,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -70,10 +72,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(problemSupport)
                         .accessDeniedHandler(problemSupport))
-                .cors(cors->cors.configurationSource(corsConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeRequests(authorizeRequests -> authorizeRequests
                         .antMatchers("/admin/**").hasRole("ADMIN")
-                        .antMatchers("/api/**").hasRole("USER")
+                        .antMatchers("/api/users/manager").hasRole("MANAGER")
+                        .antMatchers("/api/users/email/{email}").hasRole("USER")
+//                        .antMatchers("/api/users/{username}").access("hasRole('ADMIN') or authentication.name.equals(#username)")
+                        .antMatchers("/api/users/{username}").access("hasRole('ADMIN') or @userServiceImpl.isValidUser(authentication,#username)")
+
                         .anyRequest().authenticated())
                 .addFilterAt(restAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf(Customizer.withDefaults())
@@ -157,6 +163,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         encoders.put(idForEncode, new BCryptPasswordEncoder());
         encoders.put("SHA-1", new MessageDigestPasswordEncoder("SHA-1"));
         return new DelegatingPasswordEncoder(idForEncode, encoders);
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy(){
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_MANAGER\nROLE_MANAGER > ROLE_USER");
+        return roleHierarchy;
     }
 
     private RestAuthenticationFilter restAuthenticationFilter() throws Exception {

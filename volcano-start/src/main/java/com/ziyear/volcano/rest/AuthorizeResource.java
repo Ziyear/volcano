@@ -59,7 +59,7 @@ public class AuthorizeResource {
                 .password(userDto.getPassword())
                 .build();
         // 2 userDTO转换成 user 保存 设置默认角色 （ROLE_USER）
-        userService.register(user);
+        userService.saveUser(user);
     }
 
     @PostMapping("/token")

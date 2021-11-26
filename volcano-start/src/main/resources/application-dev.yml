@@ -14,8 +14,6 @@ logging:
               %clr([%8.15t]){cyan} %clr(%-40.40logger{0}){blue} %clr(:){red} %clr(%m){faint}%n'
 spring:
   profiles: dev
-  cache:
-    type: none
   redis:
     host: localhost
     port: 6379

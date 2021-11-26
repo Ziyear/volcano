@@ -2,6 +2,7 @@ package com.ziyear.volcano.service;
 
 import com.ziyear.volcano.domain.Auth;
 import com.ziyear.volcano.domain.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -21,11 +22,15 @@ public interface UserService {
     boolean isMobileExist(String mobile);
 
 
-    User register(User user);
+    User saveUser(User user);
 
     Optional<User> findOptionalByUsernameAndPassword(String username, String password);
 
     void upgradePasswordEncodingIfNeeded(User user, String password);
 
     Optional<String> createTotp(String key);
+
+    boolean isValidUser(Authentication authentication,String username);
+
+    Optional<User> findOptionalByEmail(String email);
 }

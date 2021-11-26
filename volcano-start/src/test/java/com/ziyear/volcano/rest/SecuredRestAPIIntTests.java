@@ -37,4 +37,32 @@ public class SecuredRestAPIIntTests {
             .andDo(print())
             .andExpect(status().isOk());
     }
+
+    @WithMockUser(username = "user", roles = {"USER"})
+//    @WithMockUser(username = "ZHANGSAN", roles = {"USER"})
+    @Test
+    public void givenRoleUserOrAdmin_thenAccessSuccess() throws Exception {
+        mvc.perform(get("/api/users/{username}", "user"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(username = "lisi")
+//    @WithMockUser(username = "zhangsan")
+    @Test
+    public void givenUserRole_whenQueryUserByEmail_shouldSuccess() throws Exception {
+        mvc.perform(get("/api/users/email/{email}", "zs@local.com"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @WithMockUser(username = "lisi",roles = "USER")
+//    @WithMockUser(username = "lisi",roles = "ADMIN")
+    @Test
+    public void managerTest() throws Exception {
+        mvc.perform(get("/api/users/manager"))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
 }

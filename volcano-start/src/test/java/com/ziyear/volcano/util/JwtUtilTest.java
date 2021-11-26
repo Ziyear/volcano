@@ -36,7 +36,7 @@ public class JwtUtilTest {
         Set<Role> list = new HashSet<>();
         list.add(role1);
         list.add(role2);
-        user.setAuthorities(list);
+        user.setRoles(list);
         String jwtToken = jwtUtil.createAccessToken(user);
         System.out.println(jwtToken);
     }

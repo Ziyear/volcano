@@ -1,10 +1,13 @@
 package com.ziyear.volcano.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.querydsl.core.annotations.QueryEntity;
 import com.ziyear.volcano.validation.annotation.ValidEmail;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -12,7 +15,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 用户实体类，实现了 UserDetails 接口
@@ -23,6 +29,7 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
+@QueryEntity
 @Entity
 @Table(name = "volcano_users")
 public class User implements UserDetails, Serializable {
@@ -157,7 +164,12 @@ public class User implements UserDetails, Serializable {
             name = "volcano_users_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    private Set<Role> authorities;
+    private Set<Role> roles;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream().flatMap(role -> Stream.concat(Stream.of(new SimpleGrantedAuthority(role.getRoleCode())), role.getPermissions().stream())).collect(Collectors.toList());
+    }
 
     @Override
     public boolean isAccountNonExpired() {

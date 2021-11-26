@@ -1,6 +1,7 @@
 package com.ziyear.volcano.service.impl;
 
 import com.google.common.collect.Sets;
+import com.ziyear.volcano.annotation.RoleAdminOrSelfWithUserParam;
 import com.ziyear.volcano.dao.RoleDao;
 import com.ziyear.volcano.dao.UserDao;
 import com.ziyear.volcano.domain.Auth;
@@ -10,6 +11,7 @@ import com.ziyear.volcano.util.Constants;
 import com.ziyear.volcano.util.JwtUtil;
 import com.ziyear.volcano.util.TotpUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,10 +55,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public User register(User user) {
+    @RoleAdminOrSelfWithUserParam
+    public User saveUser(User user) {
         return roleDao.findByRoleCode(Constants.ROLE_USER)
                 .map(role -> {
-                    User user2Save = user.withAuthorities(Sets.newHashSet(role))
+                    User user2Save = user.withRoles(Sets.newHashSet(role))
                             .withPassword(passwordEncoder.encode(user.getPassword()))
                             .withMfaKey(totpUtil.encodeKeyToString());
                     return userDao.save(user2Save);
@@ -67,7 +70,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findOptionalByUsernameAndPassword(String username, String password) {
         return userDao.findOptionalByUsername(username)
-                .filter(user -> passwordEncoder.matches(password,user.getPassword()));
+                .filter(user -> passwordEncoder.matches(password, user.getPassword()));
     }
 
     @Override
@@ -80,5 +83,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<String> createTotp(String key) {
         return totpUtil.createTotp(key);
+    }
+
+    @Override
+    public boolean isValidUser(Authentication authentication, String username) {
+        return authentication.getName().equals(username);
+    }
+
+    @Override
+    public Optional<User> findOptionalByEmail(String email) {
+        return userDao.findOptionalByEmail(email);
     }
 }
