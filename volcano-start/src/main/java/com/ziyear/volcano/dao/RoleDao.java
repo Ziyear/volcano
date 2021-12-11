@@ -1,11 +1,13 @@
 package com.ziyear.volcano.dao;
 
+import com.querydsl.core.types.dsl.StringExpression;
 import com.ziyear.volcano.domain.QRole;
 import com.ziyear.volcano.domain.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
@@ -33,4 +35,10 @@ public interface RoleDao extends JpaRepository<Role, Long>, QuerydslPredicateExe
     Optional<Role> findOptionalByRoleName(String roleStaff);
 
     Set<Role> findByIdIn(HashSet<Long> longs);
+
+    @Override
+    default void customize(QuerydslBindings bindings, QRole root) {
+        bindings.bind(root.roleName).first(StringExpression::containsIgnoreCase);
+        bindings.bind(root.displayName).first(StringExpression::containsIgnoreCase);
+    }
 }

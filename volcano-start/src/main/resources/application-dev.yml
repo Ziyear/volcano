@@ -76,3 +76,5 @@ volcano:
     secretKey: ${TX_SECRET_KEY}
   email-provider:
     name: smtp
+  security:
+    role-hierarchy-enabled: true

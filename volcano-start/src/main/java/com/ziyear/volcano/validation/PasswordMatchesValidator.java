@@ -1,20 +1,18 @@
 package com.ziyear.volcano.validation;
 
-import com.ziyear.volcano.domain.dto.UserDto;
+import com.ziyear.volcano.domain.dto.RegisterDto;
 import com.ziyear.volcano.validation.annotation.PasswordMatches;
-import lombok.val;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class PasswordMatchesValidator implements ConstraintValidator<PasswordMatches, UserDto> {
+public class PasswordMatchesValidator implements ConstraintValidator<PasswordMatches, RegisterDto> {
 
     @Override
     public void initialize(final PasswordMatches constraintAnnotation) { }
 
     @Override
-    public boolean isValid(final UserDto obj, final ConstraintValidatorContext context) {
-        val user = (UserDto) obj;
-        return user.getPassword().equals(user.getMatchingPassword());
+    public boolean isValid(final RegisterDto obj, final ConstraintValidatorContext context) {
+        return obj.getPassword().equals(obj.getMatchingPassword());
     }
 }

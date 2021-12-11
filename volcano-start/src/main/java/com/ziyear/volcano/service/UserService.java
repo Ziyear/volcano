@@ -33,4 +33,6 @@ public interface UserService {
     boolean isValidUser(Authentication authentication,String username);
 
     Optional<User> findOptionalByEmail(String email);
+
+    Optional<User> findOptionalByUsername(String username);
 }

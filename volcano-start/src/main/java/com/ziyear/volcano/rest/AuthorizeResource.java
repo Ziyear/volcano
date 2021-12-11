@@ -2,10 +2,7 @@ package com.ziyear.volcano.rest;
 
 import com.ziyear.volcano.domain.Auth;
 import com.ziyear.volcano.domain.User;
-import com.ziyear.volcano.domain.dto.LoginDTO;
-import com.ziyear.volcano.domain.dto.SendTotpDto;
-import com.ziyear.volcano.domain.dto.TotpVerificationDto;
-import com.ziyear.volcano.domain.dto.UserDto;
+import com.ziyear.volcano.domain.dto.*;
 import com.ziyear.volcano.enums.MfaType;
 import com.ziyear.volcano.exception.*;
 import com.ziyear.volcano.service.EmailService;
@@ -40,23 +37,23 @@ public class AuthorizeResource {
     }
 
     @PostMapping("/register")
-    public void register(@Valid @RequestBody UserDto userDto) {
+    public void register(@Valid @RequestBody RegisterDto registerDto) {
         // 1 检查username，email，mobile 唯一
-        if (userService.isUserNameExist(userDto.getUsername())) {
+        if (userService.isUserNameExist(registerDto.getUsername())) {
             throw new DuplicateProblem("用户名重复");
         }
-        if (userService.isEmailExist(userDto.getEmail())) {
+        if (userService.isEmailExist(registerDto.getEmail())) {
             throw new DuplicateProblem("邮箱重复");
         }
-        if (userService.isMobileExist(userDto.getMobile())) {
+        if (userService.isMobileExist(registerDto.getMobile())) {
             throw new DuplicateProblem("手机号重复");
         }
         User user = User.builder()
-                .username(userDto.getUsername())
-                .name(userDto.getName())
-                .email(userDto.getEmail())
-                .mobile(userDto.getMobile())
-                .password(userDto.getPassword())
+                .username(registerDto.getUsername())
+                .name(registerDto.getName())
+                .email(registerDto.getEmail())
+                .mobile(registerDto.getMobile())
+                .password(registerDto.getPassword())
                 .build();
         // 2 userDTO转换成 user 保存 设置默认角色 （ROLE_USER）
         userService.saveUser(user);

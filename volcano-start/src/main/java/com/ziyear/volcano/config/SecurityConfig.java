@@ -5,10 +5,12 @@ import com.ziyear.volcano.security.auth.ldap.LDAPMultiAuthenticationProvider;
 import com.ziyear.volcano.security.auth.ldap.LDAPUserDao;
 import com.ziyear.volcano.security.filter.RestAuthenticationFilter;
 import com.ziyear.volcano.security.jwt.JwtFilter;
+import com.ziyear.volcano.security.rolehierarchy.RoleHierarchyService;
 import com.ziyear.volcano.security.userdetails.UserDetailsPasswordServiceImpl;
 import com.ziyear.volcano.security.userdetails.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -17,7 +19,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -62,6 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final LDAPUserDao ldapUserDao;
     private final JwtFilter jwtFilter;
     private final Environment environment;
+    private final RoleHierarchyService roleHierarchyService;
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -165,10 +168,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new DelegatingPasswordEncoder(idForEncode, encoders);
     }
 
+//    @Bean
+//    public RoleHierarchy roleHierarchy(){
+//        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+//        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_MANAGER\nROLE_MANAGER > ROLE_USER");
+//        return roleHierarchy;
+//    }
+
+
+    @ConditionalOnProperty(prefix = "volcano.security", name = "role-hierarchy-enabled", havingValue = "true")
     @Bean
-    public RoleHierarchy roleHierarchy(){
+    public RoleHierarchyImpl roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_MANAGER\nROLE_MANAGER > ROLE_USER");
+        roleHierarchy.setHierarchy(roleHierarchyService.getRoleHierarchyExpr());
         return roleHierarchy;
     }
 

@@ -1,12 +1,13 @@
 package com.ziyear.volcano.domain;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.PathMetadata;
+import static com.querydsl.core.types.PathMetadataFactory.*;
+
 import com.querydsl.core.types.dsl.*;
 
+import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
-
-import static com.querydsl.core.types.PathMetadataFactory.forVariable;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -22,8 +23,6 @@ public class QUser extends EntityPathBase<User> {
     public final BooleanPath accountNonExpired = createBoolean("accountNonExpired");
 
     public final BooleanPath accountNonLocked = createBoolean("accountNonLocked");
-
-    public final CollectionPath<org.springframework.security.core.GrantedAuthority, SimplePath<org.springframework.security.core.GrantedAuthority>> authorities = this.<org.springframework.security.core.GrantedAuthority, SimplePath<org.springframework.security.core.GrantedAuthority>>createCollection("authorities", org.springframework.security.core.GrantedAuthority.class, SimplePath.class, PathInits.DIRECT2);
 
     public final BooleanPath credentialsNonExpired = createBoolean("credentialsNonExpired");
 

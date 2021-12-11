@@ -94,4 +94,9 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findOptionalByEmail(String email) {
         return userDao.findOptionalByEmail(email);
     }
+
+    @Override
+    public Optional<User> findOptionalByUsername(String username) {
+        return userDao.findOptionalByUsername(username);
+    }
 }

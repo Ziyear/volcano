@@ -20,8 +20,6 @@ public class QPermission extends EntityPathBase<Permission> {
 
     public static final QPermission permission = new QPermission("permission");
 
-    public final StringPath authority = createString("authority");
-
     public final StringPath displayName = createString("displayName");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
