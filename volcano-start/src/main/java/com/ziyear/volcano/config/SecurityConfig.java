@@ -145,9 +145,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         if (environment.acceptsProfiles(Profiles.of("dev"))) {
-            corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4001"));
+            corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4001/"));
         } else {
-            corsConfiguration.setAllowedOrigins(Collections.singletonList("http://volcano.ziyear.com"));
+            corsConfiguration.setAllowedOrigins(Collections.singletonList("http://volcano.ziyear.com/"));
         }
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));

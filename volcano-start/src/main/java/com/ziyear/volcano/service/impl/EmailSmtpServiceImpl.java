@@ -3,6 +3,7 @@ package com.ziyear.volcano.service.impl;
 import com.ziyear.volcano.service.EmailService;
 import com.ziyear.volcano.util.Constants;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
  * @author zhaorui 2021-10-28 14:25
  */
 
+@Slf4j
 @ConditionalOnProperty(prefix = "volcano.email-provider", name = "name", havingValue = "smtp")
 @RequiredArgsConstructor
 @Service
@@ -32,5 +34,6 @@ public class EmailSmtpServiceImpl implements EmailService {
         message.setSubject("App volcano Verification code");
         message.setText("您的验证码为:" + msg + ", 有效期" + Constants.VERIFY_CODE_VALID_MINUTES + "分钟。");
         emailSender.send(message);
+        log.info("发送邮件成功，内容={}", message.getText());
     }
 }

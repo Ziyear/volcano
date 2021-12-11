@@ -74,7 +74,7 @@ public class SmsServiceTxSmsImpl implements SmsService {
             SendSmsResponse res = client.SendSms(req);
 
             // 输出json格式的字符串回包
-            log.info("短信发送成功，返回值：{}", SendSmsResponse.toJsonString(res));
+            log.info("短信发送成功，验证码={}，返回值：{}", msg, SendSmsResponse.toJsonString(res));
         } catch (TencentCloudSDKException e) {
             log.error("发送短信时产生服务端异常 {}", e.getLocalizedMessage());
         }

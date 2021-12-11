@@ -22,12 +22,12 @@ public class RoleHierarchyReloadAspect {
     private final RoleHierarchyImpl roleHierarchyImpl;
     private final RoleHierarchyService roleHierarchyService;
 
-    @Pointcut("execution(* com.ziyear.volcano.service.admin.*.*(..))")
+    @Pointcut("execution(* com.ziyear.volcano.service.admin.*.*(..)) && @annotation(com.ziyear.volcano.annotation.ReloadRoleHierarchy)")
     public void pointcut() {
 
     }
 
-    @AfterReturning("pointcut() && @annotation(com.ziyear.volcano.annotation.ReloadRoleHierarchy)")
+    @AfterReturning("pointcut()")
     public void reloadRoleHierarchy() {
         String hierarchyExpr = roleHierarchyService.getRoleHierarchyExpr();
         roleHierarchyImpl.setHierarchy(hierarchyExpr);

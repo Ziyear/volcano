@@ -3,8 +3,9 @@ import Vuex from "vuex";
 import AUTH_API from "../services/auth.service";
 import router from "../router";
 import UTIL from "@/core/util";
-import { usersModule } from "./modules/users.js";
-import { registerModule } from "./modules/register.js";
+import { usersModule } from "./modules/users";
+import { rolesModule } from "./modules/roles";
+import { registerModule } from "./modules/register";
 
 Vue.use(Vuex);
 
@@ -155,9 +156,19 @@ export default new Vuex.Store({
       const permissions = payload["authorities"];
       return permissions || [];
     },
+    username: (state) => {
+      const token = state.auth.accessToken;
+      if (!token) {
+        return "";
+      }
+      const payload = UTIL.parseJwt(token);
+      const username = payload["sub"];
+      return username || "";
+    },
   },
   modules: {
     usersModule,
+    rolesModule,
     registerModule,
   },
 });
